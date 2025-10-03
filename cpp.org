@@ -1,0 +1,197 @@
+#+title: Cpp
+
+#### 1. Using `std::find` (Most Common - C++17)
+```cpp
+#include <algorithm>
+#include <vector>
+
+std::vector<int> vec = {1, 2, 3, 4};
+int element = 5;
+
+if (std::find(vec.begin(), vec.end(), element) == vec.end()) {
+    vec.push_back(element);
+}
+```
+- **Time Complexity**: O(n)
+- **Why it's clean**: Clear intent, standard library consistency, simple mental model, no hidden complexity
+
+#### 2. Alternative Approaches
+```cpp
+// Using std::any_of (more expressive)
+if (!std::any_of(vec.begin(), vec.end(), [element](int x) { return x == element; })) {
+    vec.push_back(element);
+}
+
+// Template helper function (reusable)
+template<typename Container, typename T>
+void push_back_unique(Container& container, const T& element) {
+    if (std::find(container.begin(), container.end(), element) == container.end()) {
+        container.push_back(element);
+    }
+}
+```
+
+#### 3. Better Data Structures for Frequent Operations
+```cpp
+// O(1) average case with unordered_set
+std::unordered_set<int> unique_elements;
+unique_elements.insert(element); // Automatically handles duplicates
+
+// Hybrid approach: Vector + Set for fast lookups
+std::vector<int> vec;
+std::unordered_set<int> seen;
+if (seen.insert(element).second) {
+    vec.push_back(element);
+}
+```
+
+## Loop Design Best Practices
+
+### vector.size() vs Cached Size
+
+#### Recommended Approach
+```cpp
+// Use vector.size() directly - it's O(1) and always current
+for (size_t i = 0; i < vec.size(); ++i) {
+    // loop body
+}
+```
+
+#### Why This is Better
+- `vector.size()` is O(1) - no performance penalty
+- Always reflects current size
+- Standard C++ idiom
+- Compiler optimizations apply
+
+#### When to Cache Size
+```cpp
+// Only when intentionally preventing size changes during iteration
+const size_t original_size = vec.size();
+for (size_t i = 0; i < original_size; ++i) {
+    vec.push_back(process(vec[i])); // Growing vector, but only process originals
+}
+```
+
+### Why Use size_t for Loop Indices
+
+#### Reasons for size_t
+1. **Type matching**: `vector.size()` returns `size_t`
+2. **Prevents warnings**: No signed/unsigned comparison warnings
+3. **Range capability**: Can handle large containers (64-bit on 64-bit systems)
+4. **Standard convention**: All STL size functions return `size_t`
+5. **Semantic correctness**: Sizes can't be negative
+
+```cpp
+// Good - no warnings, proper type matching
+for (size_t i = 0; i < vec.size(); ++i) { }
+
+// Problematic - compiler warnings about signed/unsigned comparison
+for (int i = 0; i < vec.size(); ++i) { }
+```
+
+## STL Containers and Iterators Overview
+
+### Iterator Types
+```cpp
+std::vector<int> vec = {1, 2, 3, 4, 5};
+
+// Forward iterators
+vec.begin()   // mutable forward iterator
+vec.end()
+vec.cbegin()  // const forward iterator
+vec.cend()
+
+// Reverse iterators
+vec.rbegin()  // mutable reverse (starts at end)
+vec.rend()
+vec.crbegin() // const reverse iterator
+vec.crend()
+```
+
+### Container Categories
+
+#### Sequence Containers
+- **`std::vector`**: Dynamic array, random access, O(1) back operations
+- **`std::deque`**: Double-ended queue, fast front/back operations
+- **`std::list`**: Doubly-linked list, fast insert/delete anywhere
+- **`std::forward_list`**: Singly-linked list, memory efficient
+- **`std::array`**: Fixed-size array (C++11)
+
+#### Associative Containers (Tree-based, Sorted)
+- **`std::set`**: Unique elements, O(log n) operations
+- **`std::multiset`**: Allow duplicates, O(log n) operations
+- **`std::map`**: Key-value pairs, O(log n) operations
+- **`std::multimap`**: Duplicate keys allowed, O(log n) operations
+
+#### Unordered Containers (Hash-based)
+- **`std::unordered_set`**: Hash set, O(1) average lookup
+- **`std::unordered_multiset`**: Hash set with duplicates
+- **`std::unordered_map`**: Hash map, O(1) average lookup
+- **`std::unordered_multimap`**: Hash map with duplicate keys
+
+#### Container Adaptors
+- **`std::stack`**: LIFO (Last In, First Out)
+- **`std::queue`**: FIFO (First In, First Out)
+- **`std::priority_queue`**: Heap, always gives maximum element first
+
+### Container Selection Guide
+```cpp
+// Need random access + dynamic size? → std::vector
+// Need fast insertion at both ends? → std::deque
+// Need fast insertion/deletion in middle? → std::list
+// Need unique elements + fast lookup? → std::unordered_set (O(1)) or std::set (O(log n), sorted)
+// Need key-value mapping + fast lookup? → std::unordered_map (O(1)) or std::map (O(log n), sorted)
+// Need LIFO behavior? → std::stack
+// Need FIFO behavior? → std::queue
+// Need always-maximum element? → std::priority_queue
+```
+
+## Time Complexity Patterns
+
+### Common Algorithmic Complexities
+- **O(1)**: Hash table lookup (`unordered_set`, `unordered_map`)
+- **O(log n)**: Binary search, balanced trees (`set`, `map`)
+- **O(n)**: Linear search (`std::find`)
+- **O(n log n)**: Sorting (`std::sort`)
+
+### Performance-Driven Container Choice
+```cpp
+// For frequent "check existence" operations:
+std::unordered_set<int> seen;        // O(1) average case
+if (seen.find(element) != seen.end()) { ... }
+
+// vs
+std::vector<int> vec;                 // O(n) linear search
+if (std::find(vec.begin(), vec.end(), element) != vec.end()) { ... }
+```
+
+## Learning Resources Recommended
+
+### Essential Books
+- **"Introduction to Algorithms" (CLRS)** - Definitive algorithms reference
+- **"Effective STL" by Scott Meyers** - STL best practices
+- **"The C++ Standard Library" by Nicolai Josuttis** - Comprehensive STL guide
+
+### Online Resources
+- **cppreference.com** - Authoritative C++ reference
+- **MIT 6.006** - Introduction to Algorithms (free)
+- **LeetCode** - Algorithm practice with pattern recognition
+- **C++ Core Guidelines** - Best practices by Bjarne Stroustrup
+
+### Systematic Learning Plan
+1. **Week 1-2**: Basic data structures (vectors, lists, hash tables)
+2. **Week 3-4**: Tree structures (sets, maps, balanced trees)
+3. **Week 5-6**: Algorithm patterns (two pointers, binary search)
+4. **Week 7-8**: Advanced topics (dynamic programming, graphs)
+
+## Key Takeaways
+
+1. **Choose the right data structure** - Often eliminates algorithmic complexity
+2. **Use `std::find` for simple cases** - Clean, readable, standard
+3. **Use `size_t` for indices** - Type safety and standard compliance
+4. **Don't cache `vector.size()`** - It's already O(1) and stays current
+5. **Learn container time complexities** - Critical for performance decisions
+6. **Master iterators** - They connect containers and algorithms
+7. **Pattern recognition** - Different problems need different container strategies
+
+The core insight: **Algorithmic thinking in C++ often comes down to choosing the right STL container for your access patterns rather than optimizing operations on the wrong container.**
