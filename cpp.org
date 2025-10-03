@@ -165,25 +165,6 @@ std::vector<int> vec;                 // O(n) linear search
 if (std::find(vec.begin(), vec.end(), element) != vec.end()) { ... }
 ```
 
-## Learning Resources Recommended
-
-### Essential Books
-- **"Introduction to Algorithms" (CLRS)** - Definitive algorithms reference
-- **"Effective STL" by Scott Meyers** - STL best practices
-- **"The C++ Standard Library" by Nicolai Josuttis** - Comprehensive STL guide
-
-### Online Resources
-- **cppreference.com** - Authoritative C++ reference
-- **MIT 6.006** - Introduction to Algorithms (free)
-- **LeetCode** - Algorithm practice with pattern recognition
-- **C++ Core Guidelines** - Best practices by Bjarne Stroustrup
-
-### Systematic Learning Plan
-1. **Week 1-2**: Basic data structures (vectors, lists, hash tables)
-2. **Week 3-4**: Tree structures (sets, maps, balanced trees)
-3. **Week 5-6**: Algorithm patterns (two pointers, binary search)
-4. **Week 7-8**: Advanced topics (dynamic programming, graphs)
-
 ## Key Takeaways
 
 1. **Choose the right data structure** - Often eliminates algorithmic complexity

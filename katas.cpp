@@ -9,6 +9,8 @@
 #include <set>
 #include <functional> // Required for std::greater<>
 #include <bitset>
+#include <climits> // For CHAR_BIT
+
 
 class ScalingSqStrings
 {
@@ -223,19 +225,36 @@ std::vector<int> menFromBoysII(std::vector<int> values)
 }
 
 unsigned int reverse_bits(unsigned int n) {
-  std::string str = std::bitset<8>(n).to_string();
-  std::reverse(str.begin(), str.end());
-  int i = std::stoi(str, nullptr, 2);
-  std::cout << i << std::endl;
-  return i;
+    unsigned int reversed_n = 0;
+
+    // Loop until all bits of the original number have been processed.
+    // This correctly handles numbers of any bit-length.
+    while (n > 0) {
+        // 1. Left shift the result to make space for the next bit.
+        reversed_n <<= 1;
+
+        // 2. Get the least significant bit (LSB) of n.
+        //    (n & 1) will be 1 if the last bit of n is 1, and 0 otherwise.
+        unsigned int lsb = n & 1;
+
+        // 3. Add (OR) this LSB to our result.
+        reversed_n |= lsb;
+
+        // 4. Right shift n to process the next bit in the following iteration.
+        n >>= 1;
+    }
+
+    return reversed_n;
 }
 
 int main () {
 
    //for (const auto& i: container) {
       //std::cout << i << ' ';
-   //}
-   reverse_bits(417);
+   //
+   unsigned int small_num = 13; // Binary (8-bit): 00001101
+   // Full 32-bit reversed: 10110000 00000000 00000000 00000000 (2,952,790,016)
+   reverse_bits(13);
    solve({1, 21, 4, 7, 5});
    return 0;
 }
